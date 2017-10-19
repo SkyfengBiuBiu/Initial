@@ -1,0 +1,112 @@
+<html>
+    <head>
+        <title>离线地图</title>
+        <link rel="stylesheet" href="dist/leaflet.css" />
+        <link rel="stylesheet" href="dist/mobile.css" />
+        <link rel="stylesheet" href="dist/locate.css" />
+    
+        <script src="dist/leaflet.js"></script>
+        <script src="dist/proj4js-compressed.js"></script>
+        <script src="dist/proj4leaflet.js"></script>
+        <script src="dist/locate.js" ></script>
+    </head>
+    <body>
+        <div id="map"></div>
+    </body>
+    <script type="text/javascript">
+	
+    function getLocation() {
+    	var options = {
+    	enableHighAccuracy : true,
+    	maximumAge : 1000
+    	}
+    	//alert('this is getLocation()');
+    	if (navigator.geolocation) {
+    		navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
+    	} else {
+    	//浏览器不支持geolocation
+    	alert('您的浏览器不支持地理位置定位');
+    	}
+    	}
+  //成功时
+    function onSuccess(position) {
+    //返回用户位置
+    //经度
+    var longitude = position.coords.longitude;
+    //纬度
+    var latitude = position.coords.latitude;
+    
+        var map = L.map('map', {
+		center: [latitude,longitude],
+		zoom: 10,
+		minZoom: 10,
+		maxZoom: 12});
+		
+		L.control.scale().addTo(map);
+
+        L.tileLayer('GISMap/titles/{z}/{x}/{y}.png', {
+            attribution: '&copy; Google China'
+        }).addTo(map);
+        /* L.marker([65.00, 26.00]).addTo(map)
+        .bindPopup('test')
+        .openPopup(); */
+        
+	
+        
+       // alert('当前地址的经纬度：经度' + latitude + '，纬度' + longitude);
+     
+         L.marker([latitude,longitude]).addTo(map)
+        .bindPopup('your location')
+        .openPopup(); 
+        
+        //根据经纬度获取地理位置，不太准确，获取城市区域还是可以的
+       // var map = new .Map("allmap");
+        //var point = map.Point(longitude, latitude);
+        var pos = map.LatLng(position.coords.latitude, position.coords.longitude);
+        if (typeof(marker) != "undefined") marker.setMap(null);
+		marker = map.Marker({
+			position: pos,
+			map: map,
+			title: "User location"
+		});
+		
+        /* var gc = map.Geocoder();
+        gc.getLocation(point, function(rs) {
+        var addComp = rs.addressComponents;
+        alert(addComp.province + ", " + addComp.city + ", "+ addComp.district + ", " + addComp.street + ", "+ addComp.streetNumber);
+        });
+        // 这里后面可以写你的后续操作了
+        postData(longitude, latitude); */
+        }
+        //失败时
+        function onError(error) {
+        switch (error.code) {
+        case 1:
+        alert("位置服务被拒绝");
+        break;
+        case 2:
+        alert("暂时获取不到位置信息");
+        break;
+        case 3:
+        alert("获取信息超时");
+        break;
+        case 4:
+        alert("未知错误");
+        break;
+        }
+        // 这里后面可以写你的后续操作了
+        //经度
+        var longitude = 65.00;
+        //纬度
+        var latitude = 26.00;
+        postData(longitude, latitude);
+        }
+
+        // 页面载入时请求获取当前地理位置
+        window.onload = function(){
+        // html5获取地理位置
+        getLocation();
+        };
+
+    </script>
+	</html>
